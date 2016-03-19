@@ -1,27 +1,39 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"reception/auth"
 
 	"github.com/gorilla/mux"
 )
 
-type coreHandler func(http.ResponseWriter, *http.Request) (int, error)
-
-func (fn coreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if status, err := fn(w, r); err != nil {
-		fmt.Println(status)
-	}
-}
-
-func catchAllHandler(w http.ResponseWriter, r *http.Request) (int, error) {
-	fmt.Println("Hey")
-	return http.StatusOK, nil
-}
-
 func main() {
+
+	hostname := "localhost"
+	port := "4000"
+	filepath := "./auth.json"
+
+	if os.Getenv("HOSTNAME") != "" {
+		hostname = os.Getenv("HOSTNAME")
+	}
+
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	}
+
+	if os.Getenv("FILEPATH") != "" {
+		filepath = os.Getenv("FILEPATH")
+	}
+
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		log.Fatal(err.Error())
+	}
+
+	auth.Setup(filepath)
+
 	r := mux.NewRouter()
 	r.PathPrefix("/api").Handler(coreHandler(catchAllHandler))
-	http.ListenAndServe("localhost:4000", r)
+	http.ListenAndServe(hostname+":"+port, r)
 }
