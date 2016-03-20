@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	"reception/api"
 )
 
 type coreHandler func(http.ResponseWriter, *http.Request) (int, error)
@@ -14,6 +14,15 @@ func (fn coreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func catchAllHandler(w http.ResponseWriter, r *http.Request) (int, error) {
-	fmt.Println("Hey")
+	b, err := api.Fire(r.URL.String(), "token")
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	h := w.Header()
+	w.WriteHeader(200)
+	h.Set("Content-Type", "application/json; charset=utf-8")
+	w.Write(b)
+
 	return http.StatusOK, nil
 }

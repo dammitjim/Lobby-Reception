@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -31,9 +32,19 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	auth.Setup(filepath)
+	err := auth.Setup(filepath)
+	if err != nil {
+		log.Fatal(errAuthFileDoesNotExist)
+	}
 
 	r := mux.NewRouter()
 	r.PathPrefix("/api").Handler(coreHandler(catchAllHandler))
+
+	log.Println("Reception listening on " + hostname + ":" + port)
 	http.ListenAndServe(hostname+":"+port, r)
+
 }
+
+var (
+	errAuthFileDoesNotExist = errors.New("auth.json not found in root")
+)
