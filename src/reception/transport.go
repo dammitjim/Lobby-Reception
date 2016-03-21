@@ -14,7 +14,7 @@ func (fn coreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func catchAllHandler(w http.ResponseWriter, r *http.Request) (int, error) {
-	b, err := api.Fire(r.URL.String(), "token")
+	b, err := api.Fire(r, "token")
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

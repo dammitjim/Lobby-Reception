@@ -8,12 +8,15 @@ import (
 )
 
 var baseURL = "https://api.twitch.tv/kraken"
+var acceptedURLS = []string{
+	"/games/top",
+}
 
 // Fire runs the request to the Twitch API
-func Fire(url string, accessToken string) ([]byte, error) {
+func Fire(r *http.Request, accessToken string) ([]byte, error) {
 	var err error
 
-	split := strings.Split(url, "/api")
+	split := strings.Split(r.URL.String(), "/api")
 
 	if len(split) != 2 {
 		return nil, errStringSplit
@@ -26,17 +29,24 @@ func Fire(url string, accessToken string) ([]byte, error) {
 		return nil, err
 	}
 
-	resp, err := http.Get(baseURL + path)
-	if err != nil {
-		return nil, err
+	switch r.Method {
+
+	case "GET":
+		resp, err := http.Get(baseURL + path)
+		if err != nil {
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+		return ioutil.ReadAll(resp.Body)
+
+	case "PUT", "DELETE":
+		return nil, errors.New("Not yet supported")
+
 	}
-	defer resp.Body.Close()
 
-	return ioutil.ReadAll(resp.Body)
-}
+	return nil, errors.New("Invalid method supplied, found " + r.Method)
 
-func extractPath(url string) string {
-	return ""
 }
 
 func validate(path string) error {
