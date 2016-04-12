@@ -16,7 +16,7 @@ func main() {
 	port := "4000"
 	filepath := "./auth.json"
 
-	if os.Getenv("HOSTNAME") != "" {
+	if os.Getenv("HOST") != "" {
 		hostname = os.Getenv("HOSTNAME")
 	}
 
