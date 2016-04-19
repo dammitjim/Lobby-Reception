@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"reception/cache"
 	"strings"
 )
 
@@ -31,13 +32,15 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 
 	switch r.Method {
 	case "GET":
-		resp, err := http.Get(baseURL + path)
-		if err != nil {
-			return nil, err
-		}
+		return cache.Process(path, func() ([]byte, error) {
+			resp, err := http.Get(baseURL + path)
+			if err != nil {
+				return nil, err
+			}
 
-		defer resp.Body.Close()
-		return ioutil.ReadAll(resp.Body)
+			defer resp.Body.Close()
+			return ioutil.ReadAll(resp.Body)
+		})
 	}
 
 	return nil, errors.New("Invalid method supplied, found " + r.Method)

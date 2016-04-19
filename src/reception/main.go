@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"reception/auth"
+	"reception/cache"
 
 	"github.com/gorilla/mux"
 )
@@ -36,6 +37,16 @@ func main() {
 	if err != nil {
 		log.Fatal(errAuthFileDoesNotExist)
 	}
+
+	addr := os.Getenv("REDIS_ADDR")
+	auth := os.Getenv("REDIS_AUTH")
+
+	if addr == "" {
+		log.Fatal("REDIS_ADDR not supplied")
+		os.Exit(0)
+	}
+
+	cache.Setup(addr, auth)
 
 	r := mux.NewRouter()
 	r.PathPrefix("/api").Handler(coreHandler(catchAllHandler))
