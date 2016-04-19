@@ -30,7 +30,6 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 	}
 
 	switch r.Method {
-
 	case "GET":
 		resp, err := http.Get(baseURL + path)
 		if err != nil {
@@ -39,10 +38,6 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 
 		defer resp.Body.Close()
 		return ioutil.ReadAll(resp.Body)
-
-	case "PUT", "DELETE":
-		return nil, errors.New("Not yet supported")
-
 	}
 
 	return nil, errors.New("Invalid method supplied, found " + r.Method)
