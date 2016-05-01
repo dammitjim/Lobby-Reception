@@ -42,6 +42,7 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 	switch r.Method {
 	case "GET":
 		return cache.Process(path, func() ([]byte, error) {
+			log.Printf("REGENERATING: %s %s", r.Method, path)
 			req, err := http.NewRequest("GET", baseURL+path, nil)
 			if err != nil {
 				return nil, err

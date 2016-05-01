@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	timeout = 5
+	timeout = 2
 )
 
 var (
