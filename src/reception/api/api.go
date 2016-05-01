@@ -34,7 +34,11 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 		return nil, err
 	}
 
-	log.Printf("%s %s", r.Method, path)
+	defer func() {
+		ip := strings.Split(r.RemoteAddr, ":")
+		log.Printf("%s: %s %s", ip[0], r.Method, path)
+	}()
+
 	switch r.Method {
 	case "GET":
 		return cache.Process(path, func() ([]byte, error) {
