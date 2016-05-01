@@ -3,15 +3,19 @@ package api
 import (
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"reception/auth"
 	"reception/cache"
 	"strings"
 )
 
 var baseURL = "https://api.twitch.tv/kraken"
-var acceptedURLS = []string{
-	"/games/top",
+var authPaths = []string{
+	"/streams/followed",
 }
+
+var httpClient http.Client
 
 // Fire runs the request to the Twitch API
 func Fire(r *http.Request, accessToken string) ([]byte, error) {
@@ -30,10 +34,23 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 		return nil, err
 	}
 
+	log.Printf("%s %s", r.Method, path)
 	switch r.Method {
 	case "GET":
 		return cache.Process(path, func() ([]byte, error) {
-			resp, err := http.Get(baseURL + path)
+			req, err := http.NewRequest("GET", baseURL+path, nil)
+			if err != nil {
+				return nil, err
+			}
+
+			authcode := r.Header.Get("Authorization")
+			if authcode != "" {
+				req.Header.Set("Authorization", authcode)
+			}
+
+			req.Header.Set("client_id", auth.ClientID())
+
+			resp, err := httpClient.Do(req)
 			if err != nil {
 				return nil, err
 			}
