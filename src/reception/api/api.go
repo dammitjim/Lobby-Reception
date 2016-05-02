@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"reception/auth"
 	"reception/cache"
@@ -40,12 +41,15 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 		return nil, err
 	}
 
+	begin := time.Now()
+
 	defer func() {
 		ip := strings.Split(r.RemoteAddr, ":")
 		log.WithFields(log.Fields{
 			"ip":     ip[0],
 			"method": r.Method,
 			"path":   path,
+			"took":   time.Since(begin),
 		}).Info("serve")
 	}()
 
