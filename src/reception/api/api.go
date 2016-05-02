@@ -1,12 +1,16 @@
 package api
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"reception/auth"
 	"reception/cache"
+	"strconv"
 	"strings"
 )
 
@@ -50,6 +54,19 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 
 			authcode := r.Header.Get("Authorization")
 			if authcode != "" {
+				// check to see the requested url is allowed
+				match := false
+				for _, url := range authPaths {
+					if url == path {
+						match = true
+						break
+					}
+				}
+
+				if !match {
+					return nil, fmt.Errorf("Requested url %s not allowed", path)
+				}
+
 				req.Header.Set("Authorization", authcode)
 			}
 
@@ -63,6 +80,49 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 			defer resp.Body.Close()
 			return ioutil.ReadAll(resp.Body)
 		})
+	case "POST":
+		if path != "/oauth2/token" {
+			return nil, fmt.Errorf("Requested url %s not allowed", path)
+		}
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		c := strings.Split(string(body), "=")
+		if len(c) != 2 {
+			return nil, errors.New("Strings split failed")
+		}
+
+		data := url.Values{}
+		data.Set("client_id", auth.ClientID())
+		data.Set("client_secret", auth.ClientSecret())
+		data.Set("grant_type", "authorization_code")
+		data.Set("redirect_uri", auth.RedirectURL())
+		data.Set("code", c[1])
+
+		req, err := http.NewRequest("POST", baseURL+path, bytes.NewBufferString(data.Encode()))
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Content-Length", strconv.Itoa(len(data.Encode())))
+		req.Header.Set("accept", "*/*")
+
+		resp, err := httpClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		return body, nil
 	}
 
 	return nil, errors.New("Invalid method supplied, found " + r.Method)

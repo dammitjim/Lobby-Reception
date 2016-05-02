@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"reception/api"
 )
@@ -16,6 +17,7 @@ func (fn coreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func catchAllHandler(w http.ResponseWriter, r *http.Request) (int, error) {
 	b, err := api.Fire(r, "token")
 	if err != nil {
+		log.Print(err)
 		return http.StatusInternalServerError, err
 	}
 

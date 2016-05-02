@@ -49,7 +49,7 @@ func main() {
 	cache.Setup(addr, auth)
 
 	r := mux.NewRouter()
-	r.PathPrefix("/api").Handler(coreHandler(catchAllHandler))
+	r.PathPrefix("/api").Handler(coreHandler(catchAllHandler)).Methods("GET", "POST")
 
 	log.Println("Reception listening on " + hostname + ":" + port)
 	http.ListenAndServe(hostname+":"+port, r)
