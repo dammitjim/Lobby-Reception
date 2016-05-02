@@ -8,10 +8,11 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"reception/auth"
-	"reception/cache"
 	"strconv"
 	"strings"
+
+	"reception/auth"
+	"reception/cache"
 )
 
 var baseURL = "https://api.twitch.tv/kraken"
