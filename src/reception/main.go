@@ -2,13 +2,13 @@ package main
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"os"
 
 	"reception/auth"
 	"reception/cache"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 )
 

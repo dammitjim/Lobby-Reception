@@ -2,11 +2,11 @@ package cache
 
 import (
 	"errors"
-	"log"
 	"os"
 	"strconv"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/garyburd/redigo/redis"
 )
 

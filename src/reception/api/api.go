@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -13,6 +12,8 @@ import (
 
 	"reception/auth"
 	"reception/cache"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 var baseURL = "https://api.twitch.tv/kraken"
@@ -41,13 +42,20 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 
 	defer func() {
 		ip := strings.Split(r.RemoteAddr, ":")
-		log.Printf("%s: %s %s", ip[0], r.Method, path)
+		log.WithFields(log.Fields{
+			"ip":     ip[0],
+			"method": r.Method,
+			"path":   path,
+		}).Info("serve")
 	}()
 
 	switch r.Method {
 	case "GET":
 		return cache.Process(path, func() ([]byte, error) {
-			log.Printf("REGENERATING: %s %s", r.Method, path)
+			log.WithFields(log.Fields{
+				"method": r.Method,
+				"path":   path,
+			}).Info("regenerate")
 			req, err := http.NewRequest("GET", baseURL+path, nil)
 			if err != nil {
 				return nil, err

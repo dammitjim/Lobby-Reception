@@ -1,10 +1,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
+	"strings"
 
 	"reception/api"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type coreHandler func(http.ResponseWriter, *http.Request) (int, error)
@@ -18,7 +20,14 @@ func (fn coreHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func catchAllHandler(w http.ResponseWriter, r *http.Request) (int, error) {
 	b, err := api.Fire(r, "token")
 	if err != nil {
-		log.Print(err)
+		split := strings.Split(r.URL.String(), "/api")
+		path := split[1]
+		ip := strings.Split(r.RemoteAddr, ":")
+		log.WithFields(log.Fields{
+			"ip":     ip[0],
+			"method": r.Method,
+			"path":   path,
+		}).Error(err)
 		return http.StatusInternalServerError, err
 	}
 
