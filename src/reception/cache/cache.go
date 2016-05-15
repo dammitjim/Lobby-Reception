@@ -3,10 +3,10 @@ package cache
 import (
 	"errors"
 	"os"
+	"reception/logging"
 	"strconv"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -28,7 +28,7 @@ func Setup(addr string, auth string) {
 			if err == nil && auth != "" {
 				_, err = c.Do("AUTH", auth)
 				if err != nil {
-					log.Fatal(err)
+					logging.Log().Fatal(err)
 					os.Exit(1)
 				}
 			}

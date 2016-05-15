@@ -5,8 +5,7 @@ import (
 	"strings"
 
 	"reception/api"
-
-	log "github.com/Sirupsen/logrus"
+	"reception/logging"
 )
 
 type coreHandler func(http.ResponseWriter, *http.Request) (int, error)
@@ -23,7 +22,7 @@ func catchAllHandler(w http.ResponseWriter, r *http.Request) (int, error) {
 		split := strings.Split(r.URL.String(), "/api")
 		path := split[1]
 		ip := strings.Split(r.RemoteAddr, ":")
-		log.WithFields(log.Fields{
+		logging.WithFields(logging.Fields{
 			"ip":     ip[0],
 			"method": r.Method,
 			"path":   path,

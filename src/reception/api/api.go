@@ -13,8 +13,7 @@ import (
 
 	"reception/auth"
 	"reception/cache"
-
-	log "github.com/Sirupsen/logrus"
+	"reception/logging"
 )
 
 var baseURL = "https://api.twitch.tv/kraken"
@@ -45,7 +44,7 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 
 	defer func() {
 		ip := strings.Split(r.RemoteAddr, ":")
-		log.WithFields(log.Fields{
+		logging.WithFields(logging.Fields{
 			"ip":     ip[0],
 			"method": r.Method,
 			"path":   path,
@@ -56,7 +55,7 @@ func Fire(r *http.Request, accessToken string) ([]byte, error) {
 	switch r.Method {
 	case "GET":
 		return cache.Process(path, func() ([]byte, error) {
-			log.WithFields(log.Fields{
+			logging.WithFields(logging.Fields{
 				"method": r.Method,
 				"path":   path,
 			}).Info("regenerate")
