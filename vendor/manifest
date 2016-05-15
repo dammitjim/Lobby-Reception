@@ -26,6 +26,12 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/sirupsen/logrus",
+			"repository": "https://github.com/sirupsen/logrus",
+			"revision": "cd7d1bbe41066b6c1f19780f895901052150a575",
+			"branch": "master"
+		},
+		{
 			"importpath": "gopkg.in/airbrake/gobrake.v2",
 			"repository": "https://gopkg.in/airbrake/gobrake.v2",
 			"revision": "31c8ff1fb8b79a6947e6565e9a6df535f98a6b94",
